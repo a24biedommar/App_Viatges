@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#F9FAFB] pb-20">
+  <div class="min-h-screen bg-[#F9FAFB] flex flex-col">
     <!-- Header -->
     <header class="bg-white px-4 py-4 flex items-center justify-between border-b border-gray-100">
       <div>
@@ -13,7 +13,7 @@
     </header>
 
     <!-- Contingut principal -->
-    <main class="px-4 py-6">
+    <main class="px-4 py-6 flex-1">
       <!-- Secció Pròxims Viatges -->
       <section class="mb-6">
         <h2 class="text-xl font-semibold text-[#1F2937] mb-4">Pròxims Viatges</h2>
@@ -49,102 +49,38 @@
         </div>
 
         <!-- Estat buit -->
-        <div v-else class="text-center py-12">
-          <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-          </svg>
-          <p class="text-gray-500 mb-4">No tens cap viatge encara</p>
-          <button @click="crearViatge" class="btn-primary">
+        <div v-else class="text-center py-16">
+          <div class="w-20 h-20 rounded-full bg-vermell-50 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-10 h-10 text-vermell" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+          </div>
+          <p class="text-gray-500 font-medium">No tens cap viatge encara</p>
+          <p class="text-sm text-gray-400 mt-1 mb-4">Comença a planificar el teu proper viatge</p>
+          <NuxtLink to="/crear-viatge" class="btn-primary inline-block">
             Crear el primer viatge
-          </button>
+          </NuxtLink>
         </div>
       </section>
     </main>
 
     <!-- FAB per crear viatge -->
-    <button
-      @click="crearViatge"
+    <NuxtLink to="/crear-viatge"
       class="fixed bottom-20 right-4 w-14 h-14 rounded-full bg-vermell shadow-lg flex items-center justify-center text-white text-2xl hover:bg-vermell-fosc transition-transform hover:scale-110 z-40"
     >
       +
-    </button>
-
-    <!-- Modal per crear viatge -->
-    <div v-if="mostrarModalCrear" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
-        <h3 class="text-lg font-semibold mb-4">Crear nou viatge</h3>
-        
-        <form @submit.prevent="desarViatge">
-          <input
-            v-model="nouViatge.nom"
-            type="text"
-            class="input-field mb-4"
-            placeholder="Nom del viatge"
-            required
-          />
-          
-          <input
-            v-model="nouViatge.descripcio"
-            type="text"
-            class="input-field mb-4"
-            placeholder="Descripció (opcional)"
-          />
-          
-          <div class="mb-4">
-            <label class="block text-sm text-gray-600 mb-1">Data d'inici</label>
-            <input
-              v-model="nouViatge.dataInici"
-              type="date"
-              class="input-field"
-              required
-            />
-          </div>
-          
-          <div class="mb-6">
-            <label class="block text-sm text-gray-600 mb-1">Data de fi</label>
-            <input
-              v-model="nouViatge.dataFi"
-              type="date"
-              class="input-field"
-              required
-            />
-          </div>
-          
-          <button
-            type="submit"
-            class="btn-primary mb-4"
-            :disabled="carregant"
-          >
-            {{ carregant ? 'Creant...' : 'Crear viatge' }}
-          </button>
-        </form>
-        
-        <button
-          @click="mostrarModalCrear = false"
-          class="w-full text-gray-500 text-sm"
-        >
-          Cancel·lar
-        </button>
-      </div>
-    </div>
+    </NuxtLink>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { obtenirUsuariActual } from '~/js/services/auth/autenticacio.js'
-import { obtenirTots, desar } from '~/js/services/db/serveiIndexedDB.js'
+import { obtenirTots } from '~/js/services/db/serveiIndexedDB.js'
 
 const viatges = ref([])
 const carregant = ref(false)
-const mostrarModalCrear = ref(false)
 const usuariActual = ref(null)
-const nouViatge = ref({
-  nom: '',
-  descripcio: '',
-  dataInici: '',
-  dataFi: ''
-})
 
 const inicialitzar = async () => {
   try {
@@ -163,68 +99,19 @@ const inicialitzar = async () => {
 }
 
 const carregarViatges = async () => {
-  const result = await obtenirTots('viatges')
-  viatges.value = result || []
-  
-  viatges.value.sort((a, b) => new Date(a.dataInici) - new Date(b.dataInici))
-}
-
-const crearViatge = () => {
-  mostrarModalCrear.value = true
-  nouViatge.value = {
-    nom: '',
-    descripcio: '',
-    dataInici: '',
-    dataFi: ''
-  }
-}
-
-const desarViatge = async () => {
-  carregant.value = true
-  
-  const idViatge = generarId('viatge')
-  const viatge = {
-    id: idViatge,
-    nom: nouViatge.value.nom,
-    descripcio: nouViatge.value.descripcio || '',
-    dataInici: nouViatge.value.dataInici,
-    dataFi: nouViatge.value.dataFi,
-    propietariId: usuariActual.value.id,
-    participants: [usuariActual.value.id],
-    estat: 'actiu',
-    dataCreat: new Date().toISOString(),
-    dataActualitzat: new Date().toISOString()
-  }
-  
   try {
-    await desar('viatges', viatge)
-    carregant.value = false
-    mostrarModalCrear.value = false
-    await carregarViatges()
+    const result = await obtenirTots('viatges')
+    viatges.value = result || []
     
-    if (window.Swal) {
-      window.Swal.fire({
-        title: 'Èxit!',
-        text: 'Viatge creat correctament',
-        icon: 'success',
-        confirmButtonColor: '#E20613'
-      })
-    }
+    viatges.value.sort((a, b) => new Date(a.dataInici) - new Date(b.dataInici))
   } catch (error) {
-    carregant.value = false
-    
-    if (window.Swal) {
-      window.Swal.fire({
-        title: 'Error!',
-        text: error.message,
-        icon: 'error',
-        confirmButtonColor: '#E20613'
-      })
-    }
+    console.error('Error carregant viatges:', error)
+    viatges.value = []
   }
 }
 
 const obrirViatge = (id) => {
+  console.log('Obrint viatge:', id);
   window.location.href = '/viatge/' + id
 }
 
@@ -252,15 +139,11 @@ const obtenirEstilFons = (viatge) => {
     'linear-gradient(to bottom, rgba(245, 158, 11, 0.6), rgba(0,0,0,0.8))'
   ]
   
-  const index = viatge.id.charCodeAt(viatge.id.length - 1) % colors.length
-  return 'background: ' + colors[index]
+  const randomIndex = viatge.id ? viatge.id.charCodeAt(viatge.id.length - 1) % colors.length : 0
+  return `background-color: ${colors[randomIndex]}`
 }
 
-const generarId = (prefix) => {
-  const timestamp = Date.now().toString(36)
-  const random = Math.random().toString(36).substring(2, 10)
-  return prefix + '_' + timestamp + random
-}
-
-onMounted(inicialitzar)
+onMounted(() => {
+  inicialitzar()
+})
 </script>

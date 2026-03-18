@@ -130,8 +130,8 @@
 </template>
 
 <script>
-var serveiIndexedDB = null;
-var autenticacio = null;
+import { obtenirUsuariActual } from '~/js/services/auth/autenticacio.js'
+import { obtenirTots } from '~/js/services/db/serveiIndexedDB.js'
 
 export default {
   name: 'PaginaAmics',
@@ -190,10 +190,7 @@ export default {
       var self = this;
       
       if (typeof window !== 'undefined') {
-        serveiIndexedDB = require('~/js/services/db/serveiIndexedDB');
-        autenticacio = require('~/js/services/auth/autenticacio');
-        
-        var promesa = autenticacio.obtenirUsuariActual();
+        var promesa = obtenirUsuariActual();
         
         promesa.then(function(usuari) {
           if (!usuari) {
@@ -211,13 +208,13 @@ export default {
     },
     carregarAmics: function() {
       var self = this;
-      var promesa = serveiIndexedDB.obtenirTots('amics');
+      var promesa = obtenirTots('amics');
       
       promesa.then(function(amics) {
         self.amics = amics || [];
       });
       
-      var promesa2 = serveiIndexedDB.obtenirTots('invitacions');
+      var promesa2 = obtenirTots('invitacions');
       
       promesa2.then(function(invitacions) {
         self.sollicituds = invitacions || [];

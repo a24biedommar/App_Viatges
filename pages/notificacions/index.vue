@@ -7,41 +7,47 @@
 
     <!-- Contingut -->
     <div class="p-4">
-      <div v-if="notificacions.length > 0" class="space-y-2">
+      <div v-if="notificacions.length > 0" class="space-y-3">
         <div 
           v-for="notificacio in notificacions" 
           :key="notificacio.id"
-          class="bg-white rounded-xl p-4 flex items-start"
-          :class="notificacio.llegida ? '' : 'border-l-4 border-vermell'"
+          class="bg-white rounded-2xl p-4 flex items-start shadow-sm border border-gray-100"
+          :class="!notificacio.llegida ? 'border-l-4 border-vermell' : ''"
         >
           <!-- Icona -->
-          <div class="w-10 h-10 rounded-full flex items-center justify-center mr-3" :class="obtenirColorIcona(notificacio.tipus)">
-            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24" v-html="obtenirIcona(notificacio.tipus)">
+          <div class="w-12 h-12 rounded-full flex items-center justify-center mr-3 flex-shrink-0" 
+               :class="obtenirColorIcona(notificacio.tipus)">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24" v-html="obtenirIcona(notificacio.tipus)">
             </svg>
           </div>
           
           <!-- Contingut -->
-          <div class="flex-1">
-            <h3 class="font-semibold text-[#1F2937] text-sm">{{ notificacio.titol }}</h3>
-            <p class="text-sm text-gray-500">{{ notificacio.descripcio }}</p>
-            <p class="text-xs text-gray-400 mt-1">{{ notificacio.data }}</p>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold text-[#1F2937] text-sm">{{ notificacio.titol }}</h3>
+              <span class="text-xs text-gray-400 ml-2 flex-shrink-0">{{ notificacio.data }}</span>
+            </div>
+            <p class="text-sm text-gray-500 mt-1 truncate">{{ notificacio.descripcio }}</p>
           </div>
         </div>
       </div>
       
       <!-- Estat buit -->
-      <div v-else class="text-center py-12">
-        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-        </svg>
-        <p class="text-gray-500">No tens notificacions</p>
+      <div v-else class="text-center py-16">
+        <div class="w-20 h-20 rounded-full bg-vermell-50 flex items-center justify-center mx-auto mb-4">
+          <svg class="w-10 h-10 text-vermell" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+        </div>
+        <p class="text-gray-500 font-medium">No tens notificacions</p>
+        <p class="text-sm text-gray-400 mt-1">Estaràs al dia de totes les novetats</p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-var autenticacio = null;
+import { obtenirUsuariActual } from '~/js/services/auth/autenticacio.js'
 
 export default {
   name: 'PaginaNotificacions',
@@ -58,9 +64,7 @@ export default {
       var self = this;
       
       if (typeof window !== 'undefined') {
-        autenticacio = require('~/js/services/auth/autenticacio');
-        
-        var promesa = autenticacio.obtenirUsuariActual();
+        var promesa = obtenirUsuariActual();
         
         promesa.then(function(usuari) {
           if (!usuari) {
@@ -97,7 +101,7 @@ export default {
         },
         {
           id: '3',
-          tipol: 'despesa',
+          tipus: 'despesa',
           titol: 'Nova despesa',
           descripcio: 'Maria ha afegit una despesa de 45€ al viatge',
           data: '2 dies',

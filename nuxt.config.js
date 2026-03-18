@@ -3,6 +3,14 @@ export default defineNuxtConfig({
   ssr: false,
   devtools: { enabled: false },
 
+  vite: {
+    server: {
+      fs: {
+        allow: ['..', '/home/a24biedommar/Documents/1-ChatBots/RA2']
+      }
+    }
+  },
+
   modules: [
     '@nuxtjs/tailwindcss'
   ],

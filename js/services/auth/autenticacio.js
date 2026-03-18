@@ -73,15 +73,24 @@ function tancarSessio() {
 
 function obtenirUsuariActual() {
     return new Promise(function(resolve) {
-        var usuariJson = sessionStorage.getItem(USUARI_ACTUAL_CLAU);
+        try {
+            var usuariJson = null;
+            
+            if (typeof sessionStorage !== 'undefined') {
+                usuariJson = sessionStorage.getItem(USUARI_ACTUAL_CLAU);
+            }
 
-        if (!usuariJson) {
+            if (!usuariJson) {
+                resolve(null);
+                return;
+            }
+
+            var usuari = JSON.parse(usuariJson);
+            resolve(usuari);
+        } catch (e) {
+            console.error('Error obtenir usuari:', e);
             resolve(null);
-            return;
         }
-
-        var usuari = JSON.parse(usuariJson);
-        resolve(usuari);
     });
 }
 
